@@ -1,0 +1,12 @@
+[Sat Jul 11 01:52:10 2026] systemd[1]: Started Session 517 of user admin.
+[Sat Jul 11 01:52:36 2026] EXT4-fs (nvme0n1p2): mounted filesystem with ordered data mode.
+[Sat Jul 11 02:04:18 2026] ollama invoked oom-killer: gfp_mask=0x140cca, order=0, oom_score_adj=0
+[Sat Jul 11 02:04:18 2026] CPU: 2 PID: 9134 Comm: ollama
+[Sat Jul 11 02:04:18 2026] Mem-Info:
+[Sat Jul 11 02:04:18 2026] Node 0 Normal: free:38524kB min:45056kB low:56320kB high:67584kB
+[Sat Jul 11 02:04:18 2026] Out of memory: Killed process 9134 (ollama) total-vm:18604280kB, anon-rss:16048520kB, file-rss:0kB, shmem-rss:0kB, UID:1000 oom_score_adj:0
+[Sat Jul 11 02:04:19 2026] oom_reaper: reaped process 9134 (ollama), now anon-rss:0kB
+[Sat Jul 11 02:04:21 2026] systemd[1]: model-server.service: Main process exited, code=killed, status=9/KILL
+[Sat Jul 11 02:04:21 2026] systemd[1]: model-server.service: Failed with result 'signal'.
+[Sat Jul 11 02:04:22 2026] systemd[1]: model-server.service: Scheduled restart job, restart counter is at 1.
+[Sat Jul 11 02:04:23 2026] systemd[1]: Started Local AI Model Service.

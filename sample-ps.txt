@@ -1,0 +1,25 @@
+# Captured Linux process snapshot
+
+# Command executed:
+
+# ps -eo pid,stat,pcpu,pmem,rss,comm --sort=-rss | head
+
+PID     STAT   %CPU   %MEM      RSS      COMMAND
+
+9134      R     97.8    80.1   16048520   ollama
+1286      S      0.5     3.3     672944   postgres
+2419      S      0.4     2.0     418276   python3
+804       S      0.2     1.1     223980   node
+1672      D      0.0     0.8     151432   rsync
+698       S      0.0     0.5      93428   systemd-journald
+551       S      0.0     0.2      48316   sshd
+3478      Z      0.0     0.0          0   backup-worker
+462       S      0.0     0.1      25108   cron
+1         S      0.0     0.1      14320   systemd
+
+Observations
+
+• The Ollama process is consuming approximately 16 GB of resident memory.
+• The rsync process is waiting for disk I/O (D state).
+• backup-worker appears as a zombie process (Z state).
+• No abnormal CPU usage is observed outside the Ollama process.

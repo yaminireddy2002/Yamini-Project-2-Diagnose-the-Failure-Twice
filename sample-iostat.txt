@@ -1,0 +1,37 @@
+CAPTURE 1
+
+avg-cpu:
+
+%user     88.60
+%system    7.40
+%iowait    0.50
+%idle      3.50
+
+Device            tps     kB_read/s    kB_wrtn/s    await    %util
+nvme0n1          82.14      512.40        298.60      0.52      1.80
+
+Analysis
+
+The server is experiencing a **CPU-intensive workload**. Processor utilization is extremely high, while disk utilization and I/O wait remain very low. Storage is responding quickly, indicating that the processor is the primary resource under heavy demand.
+
+---
+
+CAPTURE 2
+
+avg-cpu:
+
+%user      5.10
+%system    4.20
+%iowait   74.80
+%idle     15.90
+
+Device            tps     kB_read/s    kB_wrtn/s    await    %util
+nvme0n1         315.74    3248.80      2156.30    138.70    99.10
+
+Analysis
+
+The system is experiencing a **storage I/O bottleneck**. The very high `%iowait`, elevated `await` time, and disk utilization above 99% indicate that the CPU is spending most of its time waiting for storage operations to complete rather than executing application code. This behavior is consistent with a storage-bound workload rather than a processor limitation.
+
+Conclusion
+
+Capture 1 represents a CPU-bound workload, while Capture 2 demonstrates a storage-bound workload. Comparing both snapshots illustrates how CPU utilization and I/O wait values help administrators distinguish between processing limitations and disk performance problems during Linux performance analysis.

@@ -1,0 +1,17 @@
+Jul 11 09:14:05 relief-app systemd[1]: Started Volunteer Records API.
+Jul 11 09:14:06 relief-app volunteer-api[5218]: INFO Reading configuration from /etc/volunteer-api/config.yml
+Jul 11 09:14:06 relief-app volunteer-api[5218]: INFO Initializing database connection
+Jul 11 09:14:07 relief-app volunteer-api[5218]: ERROR Database authentication failed for user "volunteer_app"
+Jul 11 09:14:07 relief-app volunteer-api[5218]: FATAL Unable to establish database connection. Startup aborted.
+Jul 11 09:14:07 relief-app systemd[1]: volunteer-api.service: Main process exited, code=exited, status=1/FAILURE
+Jul 11 09:14:07 relief-app systemd[1]: volunteer-api.service: Failed with result 'exit-code'.
+Jul 11 09:14:12 relief-app systemd[1]: volunteer-api.service: Scheduled restart job, restart counter is at 1.
+Jul 11 09:14:12 relief-app systemd[1]: Started Volunteer Records API.
+Jul 11 09:14:13 relief-app volunteer-api[5246]: ERROR Database authentication failed for user "volunteer_app"
+Jul 11 09:14:13 relief-app volunteer-api[5246]: FATAL Startup failed because the database credentials are invalid.
+Jul 11 09:14:13 relief-app systemd[1]: volunteer-api.service: Main process exited, code=exited, status=1/FAILURE
+Jul 11 09:14:13 relief-app systemd[1]: volunteer-api.service: Failed with result 'exit-code'.
+
+Summary
+
+The service repeatedly failed to start because the configured database username or password was incorrect. Systemd automatically restarted the service, but the authentication problem remained unresolved, resulting in a continuous crash loop.

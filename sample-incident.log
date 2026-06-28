@@ -1,0 +1,21 @@
+Jul 11 02:01:40 relief-gpu systemd[1]: Starting scheduled maintenance tasks...
+Jul 11 02:01:58 relief-gpu model-server[9134]: INFO Loading model: DeepSeek-7B (FP16)
+Jul 11 02:02:10 relief-gpu model-server[9134]: INFO Model loaded successfully in 12.1 seconds
+Jul 11 02:02:11 relief-gpu model-server[9134]: INFO Initializing inference engine
+Jul 11 02:02:12 relief-gpu model-server[9134]: WARN KV cache allocated for context=32768, batch=4
+Jul 11 02:02:13 relief-gpu model-server[9134]: INFO Listening on http://127.0.0.1:11434
+Jul 11 02:03:54 relief-gpu kernel: nvme0n1: I/O timeout detected, retrying request (attempt 1 of 3)
+Jul 11 02:03:55 relief-gpu kernel: nvme0n1: I/O request completed successfully after retry
+Jul 11 02:04:18 relief-gpu kernel: ollama invoked oom-killer: gfp_mask=0x140cca, order=0
+Jul 11 02:04:18 relief-gpu kernel: Out of memory: Killed process 9134 (ollama) total-vm:18604280kB, anon-rss:16048520kB
+Jul 11 02:04:19 relief-gpu kernel: oom_reaper: reaped process 9134 (ollama)
+Jul 11 02:04:21 relief-gpu systemd[1]: model-server.service: Main process exited, code=killed, status=9/KILL
+Jul 11 02:04:22 relief-gpu systemd[1]: model-server.service: Scheduled restart job, restart counter is at 1.
+Jul 11 02:04:23 relief-gpu systemd[1]: Started Local AI Model Service.
+Jul 11 02:04:36 relief-gpu model-server[9271]: INFO Reloading DeepSeek-7B (FP16)
+Jul 11 02:04:48 relief-gpu kernel: Out of memory: Killed process 9271 (ollama)
+Jul 11 02:04:49 relief-gpu systemd[1]: model-server.service: Failed with result 'signal'.
+
+Verified Incident Summary
+
+The operating system repeatedly terminated the Ollama process because the DeepSeek-7B FP16 model required more physical memory than the server could provide. Automatic service restarts did not resolve the issue because the workload exceeded the available system memory.
