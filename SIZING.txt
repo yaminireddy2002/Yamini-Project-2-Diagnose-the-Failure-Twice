@@ -1,0 +1,174 @@
+# SIZING.txt
+
+## Project 2 – Memory Sizing Analysis
+
+**Student Name:** Yamini
+
+**Course:** System Administration and Maintenance – Administering the AI-Era Enterprise
+
+**Chapter:** Chapter 2 – The Machine Underneath: Operating System Architecture
+
+---
+
+# Purpose of the Analysis
+
+The objective of this sizing analysis is to determine why the Linux operating system terminated the Ollama model server during execution. Rather than assuming that the application contained a software defect, this analysis evaluates whether the deployed workload exceeded the available hardware resources. Using the memory-sizing guidance provided in Chapter 2 together with the supplied `vram_sizer.py` worksheet, the incident is converted into measurable resource requirements that explain the observed Out-of-Memory (OOM) event.
+
+Proper workload sizing is an essential responsibility of system administrators because artificial intelligence models require large amounts of memory that extend beyond the model weights themselves. Additional memory is consumed by runtime buffers, framework overhead, and key-value (KV) cache allocations. Understanding these components allows administrators to predict deployment requirements before production failures occur.
+
+---
+
+# Memory Requirement Estimation
+
+The approximate memory requirement of an AI model can be represented using the following relationship:
+
+**Total Memory Required = Model Weights + Framework Overhead + KV Cache**
+
+Each component contributes to the total memory footprint observed by the operating system.
+
+### Model Weights
+
+Based on the supplied worksheet and Chapter 2 sizing guidelines, the estimated memory required for a 7-billion-parameter model is:
+
+| Precision     | Estimated Memory       |
+| ------------- | ---------------------- |
+| FP16          | Approximately 14–16 GB |
+| INT8          | Approximately 7–8 GB   |
+| INT4 (Q4_K_M) | Approximately 4–5 GB   |
+
+These estimates demonstrate how quantization dramatically reduces memory consumption while maintaining acceptable inference performance for many practical workloads.
+
+---
+
+# Framework Overhead
+
+The memory consumed by the model weights alone does not represent the complete workload. Inference frameworks allocate additional memory for tensors, runtime buffers, scheduling, internal data structures, and communication between software components.
+
+Chapter 2 recommends reserving approximately **15–20% additional memory** for framework overhead.
+
+Using an average overhead of 18%:
+
+Model Weights (FP16)
+
+≈15 GB
+
+Framework Overhead
+
+≈2.7 GB
+
+Estimated Total Before KV Cache
+
+≈17.7 GB
+
+This calculation already exceeds the available capacity of a typical 16 GB workstation even before additional inference memory is considered.
+
+---
+
+# KV Cache Considerations
+
+Large language models maintain a Key-Value (KV) cache during inference to improve response generation. The size of this cache increases according to the configured context length and inference batch size.
+
+The supplied incident evidence indicates:
+
+* Context Length: **32,768 tokens**
+* Batch Size: **4**
+
+These settings significantly increase memory consumption beyond the model weights alone. As context length grows, the KV cache requires additional resident memory, increasing the likelihood of resource exhaustion.
+
+For workloads using shorter context windows, such as 4K or 8K tokens, the overall memory requirement decreases substantially, allowing the same hardware to support larger workloads more reliably.
+
+---
+
+# Correlation with the Incident Evidence
+
+The kernel log recorded the following diagnostic information:
+
+> Out of memory: Killed process 8423 (ollama) total-vm:18402112kB, anon-rss:15994208kB...
+
+The recorded **anon-rss value of approximately 15.99 GB** corresponds closely with the expected memory footprint of a DeepSeek-7B FP16 model before framework overhead and KV cache expansion are fully considered.
+
+Because the operating system must also allocate memory for kernel operations, background services, filesystem caching, and other active processes, the remaining available memory was insufficient to support continued execution. The Linux kernel therefore activated the Out-of-Memory killer to preserve system stability by terminating the largest memory-consuming process.
+
+This relationship between the sizing calculations and the kernel evidence confirms that the incident resulted from workload sizing rather than application instability.
+
+---
+
+# Recommended Deployment Options
+
+Based on the calculations, the following deployment configurations are recommended.
+
+### Option 1 – FP16
+
+Estimated Memory Requirement
+
+17–18 GB
+
+Suitable Hardware
+
+24 GB or larger system memory
+
+Recommended
+
+No
+
+Reason
+
+Insufficient capacity on a standard 16 GB workstation.
+
+---
+
+### Option 2 – INT8
+
+Estimated Memory Requirement
+
+9–10 GB
+
+Suitable Hardware
+
+16 GB system memory
+
+Recommended
+
+Yes
+
+Reason
+
+Provides acceptable memory utilization while maintaining good inference quality.
+
+---
+
+### Option 3 – Q4_K_M (INT4)
+
+Estimated Memory Requirement
+
+6–7 GB
+
+Suitable Hardware
+
+16 GB system memory
+
+Recommended
+
+Highly Recommended
+
+Reason
+
+Provides the greatest stability while leaving sufficient memory available for the operating system and supporting services.
+
+---
+
+# Memory Configuration Summary
+
+| Deployment    | Estimated Total Memory | Suitable for 16 GB System |
+| ------------- | ---------------------- | ------------------------- |
+| FP16          | 17–18 GB               | No                        |
+| INT8          | 9–10 GB                | Yes                       |
+| INT4 (Q4_K_M) | 6–7 GB                 | Yes                       |
+
+---
+
+# Final Assessment
+
+The memory-sizing analysis demonstrates that the observed Out-of-Memory event was entirely predictable based on the workload requirements. The DeepSeek-7B FP16 model required nearly all available physical memory before additional framework overhead and KV cache allocations were considered. Once total memory consumption exceeded the available capacity of the host, the Linux kernel correctly invoked the Out-of-Memory killer to protect overall system stability.
+
+Deploying a Q4_K_M quantized model, selecting a shorter context length, reducing inference batch size or increasing available physical memory would prevent this incident from recurring. This analysis highlights the importance of performing workload-sizing calculations before production deployment because appropriate sizing allows administrators to avoid resource exhaustion, improve service availability, and reduce operational downtime.

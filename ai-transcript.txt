@@ -1,0 +1,125 @@
+Project 2 – Diagnose the Failure Twice
+
+AI Transcript
+
+Student Name: **Yamini**
+
+Course: System Administration and Maintenance – Administering the AI-Era Enterprise
+
+Chapter: Chapter 2 – The Machine Underneath: Operating System Architecture
+
+Date: 28-06-2026
+
+---
+
+## AI Prompt Used
+
+You are acting as a Linux systems administrator reviewing production incident evidence.
+
+The following files contain a process table, kernel log, system journal, and incident log collected from a Linux server experiencing repeated failures.
+
+Please complete the following tasks:
+
+1. Identify the most probable root cause of the incident.
+2. Specify which operating system subsystem is responsible (CPU, Memory, Storage, or Services).
+3. Quote the exact log entry that supports your conclusion.
+4. Explain the reasoning behind your diagnosis.
+5. Provide a confidence score between 0% and 100%.
+6. Suggest one possible alternative explanation and explain why it is less likely.
+7. Recommend a corrective action that addresses the root cause instead of only recovering the service.
+8. Do not assume facts that are not supported by the supplied evidence.
+
+---
+
+## AI Response
+
+### Root Cause
+
+The evidence indicates that the Linux kernel terminated the Ollama model server because the system exhausted its available physical memory. The failure belongs to the **Memory** subsystem.
+
+### Supporting Evidence
+
+"Out of memory: Killed process 8423 (ollama) total-vm:18402112kB, anon-rss:15994208kB..."
+
+"model-server.service: Main process exited, code=killed, status=9/KILL"
+
+### Explanation
+
+The process table shows that the Ollama process was consuming almost sixteen gigabytes of resident memory before the failure occurred. The kernel log explicitly records that the Out-of-Memory killer selected the process for termination. After the process was killed, systemd attempted to restart the service automatically, but the restart could not succeed because the workload still required more memory than the host could provide.
+
+### Confidence Level
+
+97%
+
+### Alternative Explanation
+
+The temporary NVMe timeout could initially suggest a storage-related issue.
+
+### Why It Was Rejected
+
+The storage retry completed successfully and no additional storage failures were recorded. The kernel later reported a confirmed Out-of-Memory event, providing stronger evidence than the earlier warning message.
+
+### Recommended Corrective Action
+
+* Deploy a smaller quantized model.
+* Reduce context length or inference batch size.
+* Increase available physical memory if larger models are required.
+* Configure appropriate memory limits within the systemd service.
+* Continue monitoring resident memory usage to distinguish workload sizing from abnormal memory growth.
+
+---
+
+## Human Verification
+
+The AI correctly identified the operating system subsystem responsible for the failure.
+
+Each quoted log entry was compared against the original evidence and verified to exist exactly as reported.
+
+The AI accurately distinguished between the kernel-generated Out-of-Memory event and the secondary service restart messages.
+
+The recommended remediation addresses the underlying memory limitation rather than treating only the visible symptom.
+
+---
+
+## Evaluation of AI Performance
+
+### Areas Where AI Performed Well
+
+* Correctly identified the memory subsystem.
+* Recognized the kernel OOM event as the primary failure.
+* Connected the service restart loop to the original kernel event.
+* Recommended practical corrective actions.
+
+### Limitations Observed
+
+Although the diagnosis was accurate, the AI response still required manual verification before being accepted. Production administrators should confirm every quoted log line and validate all recommendations against the original operating system evidence before implementing corrective actions.
+
+No fabricated log entries or unsupported assumptions were identified during this evaluation.
+
+---
+
+## Final Assessment
+
+The AI provided a technically accurate interpretation of the supplied evidence and significantly reduced the time required to understand the incident. Nevertheless, final responsibility for verifying evidence, approving remediation, and updating operational runbooks remains with the human administrator.
+
+---
+
+## AI Model Information
+
+Model Used:
+
+ChatGPT (GPT-5.5)
+
+Purpose:
+
+Technical interpretation of Linux operating system evidence.
+
+Human Oversight:
+
+Required for evidence validation, confirmation of root cause, and approval of corrective actions.
+
+Signed:
+
+---
+
+Yamini
